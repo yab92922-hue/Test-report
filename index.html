@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Discover perfect movies based on your current mood">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MovieMood">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-TileImage" content="./android-icon-144x144.png">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="./apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="./apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="./apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="./apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="./apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="./apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="./apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-icon-180x180.png">
+    
+    <!-- Android Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="./android-icon-192x192.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <title>🎬 Movie Mood Recommender</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            
+            /* Dark Theme (Default) */
+            --bg-gradient: linear-gradient(135deg, #0d0b18 0%, #15102a 50%, #06020f 100%);
+            --card-bg: rgba(22, 17, 39, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-subtitle: rgba(255, 255, 255, 0.85);
+            --accent-gradient: linear-gradient(135deg, #7f5af0 0%, #a78bfa 100%);
+            --btn-bg: rgba(255, 255, 255, 0.05);
+            --btn-hover: rgba(255, 255, 255, 0.12);
+            --inner-card-bg: rgba(30, 24, 52, 0.4);
+            --platform-tag-bg: rgba(255, 255, 255, 0.08);
+            --platform-tag-text: #e2e8f0;
+            --header-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --toggle-bg: rgba(255, 255, 255, 0.08);
+        }
+
+        body.light-theme {
+            /* Light Theme */
+            --bg-gradient: linear-gradient(135deg, #f0f2f5 0%, #d8e2dc 50%, #c9d6df 100%);
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --card-shadow: 0 15px 35px rgba(31, 38, 135, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-subtitle: #334155;
+            --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            --btn-bg: rgba(0, 0, 0, 0.03);
+            --btn-hover: rgba(0, 0, 0, 0.08);
+            --inner-card-bg: rgba(248, 250, 252, 0.8);
+            --platform-tag-bg: #e2e8f0;
+            --platform-tag-text: #334155;
+            --header-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --toggle-bg: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding: 10px 0;
+        }
+
+        .header-content {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .header-controls {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(to right, #a78bfa, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 800;
+        }
+
+        body.light-theme h1 {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-subtitle);
+            margin-bottom: 0;
+            font-size: 1.2em;
+            font-weight: 400;
+            transition: color 0.4s ease;
+        }
+
+        /* Theme Toggle Button Style */
+        .theme-toggle-btn {
+            background: var(--toggle-bg);
+            border: 1px solid var(--card-border);
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: var(--btn-hover);
+        }
+        
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* PWA Install Button */
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: none;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        .offline-indicator.online {
+            background: #27ae60;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translate(-50%, -100%);
+            }
+            to {
+                transform: translate(-50%, 0);
+            }
+        }
+
+        .mood-selector {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+        }
+
+        .mood-selector h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mood-btn {
+            padding: 15px 20px;
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            background: var(--btn-bg);
+            color: var(--text-primary);
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mood-btn:hover {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(127, 90, 240, 0.35);
+        }
+
+        .language-filter {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+        }
+
+        .language-filter h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .language-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            padding: 10px 24px;
+            border: 1px solid var(--card-border);
+            border-radius: 25px;
+            background: var(--btn-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .lang-btn.active,
+        .lang-btn:hover {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(127, 90, 240, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+            color: var(--text-primary);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--btn-bg);
+            border-top: 4px solid #7f5af0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .recommendations {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+        }
+
+        .recommendations h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .movie-card {
+            background: var(--inner-card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(127, 90, 240, 0.3);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 18px;
+        }
+
+        .no-poster {
+            width: 100%;
+            height: 350px;
+            background: var(--accent-gradient);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            margin-bottom: 18px;
+        }
+
+        .movie-title {
+            font-size: 1.35em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .movie-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .movie-rating {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85em;
+            box-shadow: 0 2px 8px rgba(127, 90, 240, 0.2);
+        }
+
+        .movie-plot {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 18px;
+            font-size: 0.95em;
+            flex-grow: 1;
+        }
+
+        .movie-platforms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .platform-tag {
+            background: var(--platform-tag-bg);
+            color: var(--platform-tag-text);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            border: 1px solid var(--card-border);
+        }
+
+        .watch-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-top: 15px;
+            font-size: 0.95em;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            border: none;
+        }
+
+        .watch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .error {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .error h2 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .mood-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .language-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .movie-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .install-btn {
+                bottom: 10px;
+                right: 10px;
+                padding: 12px 16px;
+                font-size: 0.9em;
+            }
+
+            .app-header {
+                flex-direction: column-reverse;
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            
+            .header-controls {
+                position: static;
+                transform: none;
+                margin-bottom: 10px;
+            }
+            
+            .header-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-indicator">
+        You're offline. Some features may be limited.
+    </div>
+
+    <!-- PWA Install Button -->
+    <button id="install-btn" class="install-btn">
+        📱 Install App
+    </button>
+
+    <div class="container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🎬 Movie Mood Recommender</h1>
+                <p class="subtitle">Discover perfect movies based on your current mood</p>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mood-selector">
+            <h2>What's Your Mood?</h2>
+            <div class="mood-grid">
+                <button class="mood-btn" onclick="selectMood('happy')">😊 Happy</button>
+                <button class="mood-btn" onclick="selectMood('sad')">😢 Sad</button>
+                <button class="mood-btn" onclick="selectMood('action')">⚡ Action</button>
+                <button class="mood-btn" onclick="selectMood('romantic')">💕 Romantic</button>
+                <button class="mood-btn" onclick="selectMood('scary')">😱 Scary</button>
+                <button class="mood-btn" onclick="selectMood('funny')">😂 Funny</button>
+                <button class="mood-btn" onclick="selectMood('adventurous')">🗺️ Adventurous</button>
+                <button class="mood-btn" onclick="selectMood('drama')">🎭 Drama</button>
+            </div>
+        </div>
+
+        <div class="language-filter">
+            <h3>Language Preference</h3>
+            <div class="language-buttons">
+                <button class="lang-btn active" onclick="selectLanguage('all')" data-lang="all">All Languages</button>
+                <button class="lang-btn" onclick="selectLanguage('english')" data-lang="english">English</button>
+                <button class="lang-btn" onclick="selectLanguage('hindi')" data-lang="hindi">Hindi</button>
+                <button class="lang-btn" onclick="selectLanguage('tamil')" data-lang="tamil">Tamil</button>
+            </div>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Use local backend if running on localhost/127.0.0.1, otherwise Render backend
+        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? ''
+            : 'https://moodmovierecbackend.onrender.com';
+
+        
+        let selectedMood = '';
+        let selectedLanguage = 'all';
+        let deferredPrompt;
+
+        // PWA Installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-btn').style.display = 'block';
+        });
+
+        document.getElementById('install-btn').addEventListener('click', () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        document.getElementById('install-btn').style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('✅ SW registered successfully:', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.error('❌ SW registration failed:', registrationError);
+                    });
+            });
+        }
+
+        // Online/Offline Detection
+        const offlineIndicator = document.getElementById('offline-indicator');
+
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                offlineIndicator.textContent = 'Back online!';
+                offlineIndicator.classList.add('online');
+                setTimeout(() => {
+                    offlineIndicator.style.display = 'none';
+                }, 3000);
+            } else {
+                offlineIndicator.textContent = 'You\'re offline. Some features may be limited.';
+                offlineIndicator.classList.remove('online');
+                offlineIndicator.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        function selectMood(mood) {
+            selectedMood = mood;
+            getRecommendations();
+        }
+
+        function selectLanguage(language) {
+            selectedLanguage = language;
+            
+            // Update UI
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-lang="${language}"]`).classList.add('active');
+            
+            // Get new recommendations if mood is already selected
+            if (selectedMood) {
+                getRecommendations();
+            }
+        }
+
+        async function getRecommendations() {
+            const resultsDiv = document.getElementById('results');
+            
+            // Show loading
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <h3>Finding perfect movies for your ${selectedMood} mood...</h3>
+                    <p>This may take a few seconds</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/recommend`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mood: selectedMood,
+                        language: selectedLanguage
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.recommendations.length > 0) {
+                    displayRecommendations(data.recommendations);
+                    
+                    // Show notification if supported - Updated with proper icon paths
+                    if ('serviceWorker' in navigator && 'Notification' in window) {
+                        if (Notification.permission === 'granted') {
+                            navigator.serviceWorker.ready.then(registration => {
+                                registration.showNotification('New Recommendations!', {
+                                    body: `Found ${data.recommendations.length} movies for your ${selectedMood} mood`,
+                                    icon: './android-icon-192x192.png',
+                                    badge: './android-icon-72x72.png'
+                                });
+                            });
+                        }
+                    }
+                } else {
+                    showError('No movies found. Please try a different mood or language.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (!navigator.onLine) {
+                    showError('You\'re offline. Please check your internet connection and try again.');
+                } else {
+                    showError('Unable to get recommendations. Please try again.');
+                }
+            }
+        }
+
+        function displayRecommendations(movies) {
+            const resultsDiv = document.getElementById('results');
+            
+            const moviesHTML = movies.map(movie => `
+                <div class="movie-card">
+                    ${movie.poster ? 
+                        `<img src="${movie.poster}" alt="${movie.title}" class="movie-poster">` :
+                        `<div class="no-poster">🎬</div>`
+                    }
+                    <div class="movie-title">${movie.title}</div>
+                    <div class="movie-info">
+                        <span>${movie.year}</span>
+                        <span class="movie-rating">⭐ ${movie.rating}</span>
+                    </div>
+                    <div class="movie-plot">${movie.plot}</div>
+                    <div class="movie-platforms">
+                        ${movie.platforms.map(platform => 
+                            `<span class="platform-tag">${platform}</span>`
+                        ).join('')}
+                    </div>
+                    <a href="https://new3.movies4u.finance/?s=${encodeURIComponent(movie.title)}" target="_blank" class="watch-btn">
+                        📥 Download on Movies4u
+                    </a>
+                </div>
+            `).join('');
+
+
+            resultsDiv.innerHTML = `
+                <div class="recommendations">
+                    <h2>🎬 Recommended Movies for Your ${selectedMood.charAt(0).toUpperCase() + selectedMood.slice(1)} Mood</h2>
+                    <div class="movie-grid">
+                        ${moviesHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="error">
+                    <h2>Oops! Something went wrong</h2>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Request notification permission
+        if ('Notification' in window) {
+            Notification.requestPermission();
+        }
+
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // Detect theme preference from localStorage or system setting
+        const currentTheme = localStorage.getItem('theme') || 
+            (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            
+        if (currentTheme === 'light') {
+            document.body.classList.add('light-theme');
+            themeIcon.textContent = '☀️';
+        } else {
+            document.body.classList.remove('light-theme');
+            themeIcon.textContent = '🌙';
+        }
+        
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            themeIcon.textContent = isLight ? '☀️' : '🌙';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+
+    </script>
+</body>
+</html>
