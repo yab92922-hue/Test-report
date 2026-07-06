@@ -72,7 +72,7 @@ python app.py
 **Goutam S K**
 
 GitHub:
-https://github.com/yab92922-hue/Test-report/tree/main
+https://github.com/yab92922-hue/Test-report
 
 
 
